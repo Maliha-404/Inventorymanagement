@@ -1,0 +1,42 @@
+﻿@{
+    ViewData["Title"] = "Login";
+}
+
+<h1>Login</h1>
+
+<form method="post" asp-controller="Users" asp-action="Login">
+    <div class="form-group">
+        <label for="Username">Username</label>
+        <input type="text" class="form-control" id="Username" name="username" required />
+    </div>
+
+    <div class="form-group">
+        <label for="Password">Password</label>
+        <input type="password" class="form-control" id="Password" name="password" required />
+    </div>
+
+    <div class="form-group">
+        <label for="Role">Role</label>
+        <select class="form-control" name="role" id="Role">
+            <option value="Manager">Manager</option>
+            <option value="WarehouseStaff">Warehouse Staff</option>
+            <option value="Supplier">Supplier</option>
+        </select>
+    </div>
+
+    <input type="hidden" name="returnUrl" value="@ViewData["ReturnUrl"]" />
+
+    <button type="submit" class="btn btn-primary">Login</button>
+</form>
+
+<!-- Display Success Message -->
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success">@TempData["SuccessMessage"]</div>
+}
+
+<!-- Display Error Message -->
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger">@TempData["ErrorMessage"]</div>
+}
