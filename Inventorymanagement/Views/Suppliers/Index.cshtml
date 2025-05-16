@@ -1,0 +1,36 @@
+﻿@model IEnumerable<InventoryManagement.Models.Supplier>
+
+@{
+    ViewData["Title"] = "Supplier List";
+}
+
+<h1>Supplier List</h1>
+
+<p>
+    <a href="@Url.Action("Create", "Suppliers")" class="btn btn-primary">Create New Supplier</a>
+</p>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Contact Phone</th>
+            <th>Email</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var supplier in Model)
+        {
+            <tr>
+                <td>@supplier.Name</td>
+                <td>@supplier.ContactPhone</td>
+                <td>@supplier.Email</td>
+                <td>
+                    <a href="@Url.Action("Edit", "Suppliers", new { id = supplier.SupplierID })" class="btn btn-warning">Edit</a>
+                    <a href="@Url.Action("Delete", "Suppliers", new { id = supplier.SupplierID })" class="btn btn-danger">Delete</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

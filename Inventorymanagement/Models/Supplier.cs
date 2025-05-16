@@ -9,13 +9,13 @@ namespace InventoryManagement.Models
         [Key]
         public int SupplierID { get; set; }
 
-        [Required]
+        
         [MaxLength(100)]
         public string Name { get; set; }
-
+        
         [EmailAddress]
         public string Email { get; set; }
-
+        
         [Phone]
         [Display(Name = "Contact Phone")]
         public string ContactPhone { get; set; }

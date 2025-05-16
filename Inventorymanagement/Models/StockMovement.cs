@@ -26,6 +26,8 @@ namespace InventoryManagement.Models
         [Required]
         [Display(Name = "Date/Time")]
         public DateTime MovementDate { get; set; } = DateTime.Now;
+        [Required]
+        public string Action { get; set; }
         [ForeignKey("ItemID")]
         public virtual Item Item { get; set; }
 

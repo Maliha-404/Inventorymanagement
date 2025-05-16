@@ -13,6 +13,10 @@
             <li><a href="/Users/Index">User Management</a></li>
             <li><a href="/Items/Index">Item Management</a></li>
             <li><a href="/Orders/Index">Order Management</a></li>
+        @if (User.IsInRole("Manager"))
+            {
+                <li><a href="/Suppliers/Index">Supplier Management</a></li>  <!-- Link to Supplier Management -->
+            }
         </ul>
     </div>
 
