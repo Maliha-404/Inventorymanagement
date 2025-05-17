@@ -11,11 +11,11 @@ namespace InventoryManagement.Models
 
         [Required]
         public int ItemID { get; set; }
-        public virtual Item Item { get; set; }
+        public virtual Item? Item { get; set; }
 
         [Required]
         public int SupplierID { get; set; }
-        public virtual Supplier Supplier { get; set; }
+        public virtual Supplier? Supplier { get; set; }
 
         [Required]
         [Range(1, int.MaxValue)]

@@ -86,6 +86,9 @@ namespace Inventorymanagement.Controllers
                     // Log stock movement after creating item
                     LogStockMovement(item, "Item Created");
 
+                    // Create alert for low stock
+                    CreateLowStockAlert(item);
+
                     return RedirectToAction(nameof(Index));
                 }
                 catch (Exception ex)
@@ -100,7 +103,6 @@ namespace Inventorymanagement.Controllers
             ViewData["SupplierID"] = new SelectList(_context.Suppliers, "SupplierID", "Name", item.SupplierID);
             return View(item);
         }
-
 
         // GET: Items/Edit/5
         [Authorize(Roles = "Manager")]
@@ -136,21 +138,14 @@ namespace Inventorymanagement.Controllers
             {
                 try
                 {
-                    // Log model state errors for debugging
-                    if (!ModelState.IsValid)
-                    {
-                        var errors = ModelState.Values.SelectMany(v => v.Errors).ToList();
-                        foreach (var error in errors)
-                        {
-                            Console.WriteLine(error.ErrorMessage); // Check this in your Output/Console window
-                        }
-                    }
-
                     _context.Update(item);
                     await _context.SaveChangesAsync();
 
                     // Log stock movement after editing item
                     LogStockMovement(item, "Item Edited");
+
+                    // Check for low stock and create an alert if necessary
+                    CreateLowStockAlert(item);
 
                 }
                 catch (DbUpdateConcurrencyException)
@@ -238,6 +233,24 @@ namespace Inventorymanagement.Controllers
             var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
             var user = _context.Users.FirstOrDefault(u => u.UserID.ToString() == userId);
             return user?.Role == UserRole.Supplier ? user.UserID : -1;
+        }
+
+        // Helper function to create low stock alert
+        private void CreateLowStockAlert(Item item)
+        {
+            if (item.Quantity <= item.LowStockThreshold)
+            {
+                var alert = new Alert
+                {
+                    ItemID = item.ItemID,
+                    Message = $"Stock is low for item {item.Name}. Please restock.",
+                    CreatedDate = DateTime.Now,
+                    IsActive = true
+                };
+
+                _context.Add(alert);
+                _context.SaveChanges();
+            }
         }
     }
 }

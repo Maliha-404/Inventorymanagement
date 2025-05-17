@@ -8,7 +8,7 @@
 
 <h4>Item</h4>
 <hr />
-
+<div asp-validation-summary="All" class="text-danger"></div>
 @* Role check for Managers - Hide or display content based on role *@
 @if (User.IsInRole("Manager"))
 {

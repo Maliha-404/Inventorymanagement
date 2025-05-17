@@ -59,6 +59,11 @@
                         <a asp-action="Edit" asp-route-id="@item.ItemID">Edit</a>
                         <a asp-action="Delete" asp-route-id="@item.ItemID">Delete</a> 
                     }
+                    @if (User.IsInRole("Manager") || User.IsInRole("Supplier"))
+                    {
+                        <a asp-action="StockMovements">View Stock Movements</a>
+
+                    }
                     <a asp-action="Details" asp-route-id="@item.ItemID">Details</a>
                 </td>
             </tr>

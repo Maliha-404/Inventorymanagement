@@ -11,7 +11,7 @@ namespace InventoryManagement.Models
 
         [Required]
         public int ItemID { get; set; }
-        public virtual Item Item { get; set; }
+        public virtual Item? Item { get; set; }
 
         [Required]
         public bool IsActive { get; set; } = true;

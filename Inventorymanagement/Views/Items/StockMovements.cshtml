@@ -1,0 +1,29 @@
+﻿@model IEnumerable<InventoryManagement.Models.StockMovement>
+
+<h1>Stock Movements</h1>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Item Name</th>
+            <th>Old Quantity</th>
+            <th>New Quantity</th>
+            <th>Action</th>
+            <th>Movement Date</th>
+            <th>Changed By</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var movement in Model)
+        {
+            <tr>
+                <td>@movement.Item.Name</td>
+                <td>@movement.OldQuantity</td>
+                <td>@movement.NewQuantity</td>
+                <td>@movement.Action</td>
+                <td>@movement.MovementDate</td>
+                <td>@movement.User.Username</td>
+            </tr>
+        }
+    </tbody>
+</table>

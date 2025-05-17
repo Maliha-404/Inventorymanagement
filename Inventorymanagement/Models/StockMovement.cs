@@ -27,11 +27,11 @@ namespace InventoryManagement.Models
         [Display(Name = "Date/Time")]
         public DateTime MovementDate { get; set; } = DateTime.Now;
         [Required]
-        public string Action { get; set; }
+        public string? Action { get; set; }
         [ForeignKey("ItemID")]
-        public virtual Item Item { get; set; }
+        public virtual Item? Item { get; set; }
 
         [ForeignKey("UserID")]
-        public virtual User User { get; set; }
+        public virtual User? User { get; set; }
     }
 }
