@@ -241,6 +241,12 @@ namespace Inventorymanagement.Controllers
             //    Action = action,
             //    MovementDate = DateTime.Now
             //};
+            var existingItem = _context.Items.FirstOrDefault(i => i.ItemID == item.ItemID);
+            if (existingItem == null)
+            {
+                Console.WriteLine($"Error: Item with ID {item.ItemID} not found.");
+                return;
+            }
             using (var transaction = _context.Database.BeginTransaction())
             {
                 try
