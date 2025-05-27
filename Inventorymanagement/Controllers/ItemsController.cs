@@ -28,17 +28,14 @@ namespace Inventorymanagement.Controllers
 
             if (userRole == "WarehouseStaff")
             {
-                // Warehouse Staff can only view items, no editing or deleting
                 return View(await items.ToListAsync());
             }
             else if (userRole == "Supplier")
             {
-                // Suppliers can only update stock quantity, not see everything
                 var supplierItems = await items.Where(i => i.SupplierID == GetCurrentUserSupplierID()).ToListAsync();
                 return View(supplierItems);
             }
 
-            // Managers can view all items
             return View(await items.ToListAsync());
         }
 
@@ -79,29 +76,25 @@ namespace Inventorymanagement.Controllers
             {
                 try
                 {
-                    // Adding the item to the database
                     _context.Add(item);
                     await _context.SaveChangesAsync();
-
-                    // Log stock movement after creating item
                     LogStockMovement(item, "Item Created");
-
-                    // Create alert for low stock
                     CreateLowStockAlert(item);
-
-                    return RedirectToAction(nameof(Index));
+                    //return RedirectToAction(nameof(Index));
                 }
                 catch (Exception ex)
                 {
-                    // Log the exception or output to view for debugging
-                    ModelState.AddModelError("", $"An error occurred while saving the item: {ex.Message}");
-                    return View(item);
+                    //ModelState.AddModelError("", $"An error occurred while saving the item: {ex.Message}");
+                    //ViewData["SupplierID"] = new SelectList(_context.Suppliers, "SupplierID", "Name", item.SupplierID);
+                    //return View(item);
+                    Console.WriteLine(ex.Message);
                 }
             }
 
-            // If model is not valid, repopulate the Supplier select list and return the view with the error
-            ViewData["SupplierID"] = new SelectList(_context.Suppliers, "SupplierID", "Name", item.SupplierID);
-            return View(item);
+            //ViewData["SupplierID"] = new SelectList(_context.Suppliers, "SupplierID", "Name", item.SupplierID);
+            //return View(item);
+            return RedirectToAction(nameof(Index));
+
         }
 
         // GET: Items/Edit/5
@@ -138,15 +131,22 @@ namespace Inventorymanagement.Controllers
             {
                 try
                 {
+                    // Check if the stock is updated and handle accordingly
+                    var existingItem = await _context.Items.AsNoTracking().FirstOrDefaultAsync(i => i.ItemID == item.ItemID);
+                    if (existingItem != null && existingItem.Quantity != item.Quantity)
+                    {
+                        // If quantity is updated, log the stock movement
+                        LogStockMovement(item, "Item Edited");
+                    }
+
                     _context.Update(item);
                     await _context.SaveChangesAsync();
 
-                    // Log stock movement after editing item
-                    LogStockMovement(item, "Item Edited");
-
-                    // Check for low stock and create an alert if necessary
+                    // Handle the low stock alert after edit
                     CreateLowStockAlert(item);
 
+                    // Redirect to Index after successful update
+                    return RedirectToAction(nameof(Index));
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -159,11 +159,10 @@ namespace Inventorymanagement.Controllers
                         throw;
                     }
                 }
-                return RedirectToAction(nameof(Index));
             }
 
             ViewData["SupplierID"] = new SelectList(_context.Suppliers, "SupplierID", "Name", item.SupplierID);
-            return View(item);
+            return View(item); // If update fails, stay on the edit page
         }
 
         // GET: Items/Delete/5
@@ -197,35 +196,78 @@ namespace Inventorymanagement.Controllers
             {
                 _context.Items.Remove(item);
                 await _context.SaveChangesAsync();
-
-                // Log stock movement after deleting item
                 LogStockMovement(item, "Item Deleted");
             }
 
-            return RedirectToAction(nameof(Index));
+            return RedirectToAction(nameof(Index)); // Redirect after deleting
         }
 
         private bool ItemExists(int id)
         {
             return _context.Items.Any(e => e.ItemID == id);
         }
+        // GET: Items/StockMovements
+        [Authorize(Roles = "Manager")]
+        public async Task<IActionResult> StockMovements()
+        {
+            // Retrieve all stock movements
+            var stockMovements = await _context.StockMovements
+                                                .Include(s => s.Item) // Include related Item data
+                                                .Include(s => s.User) // Include related User data
+                                                .ToListAsync();
+
+            return View(stockMovements); // Pass stock movements to the view
+        }
 
         // Helper function to log stock movement (add a stock movement record)
         private void LogStockMovement(Item item, string action)
         {
-            var stockMovement = new StockMovement
-            {
-                ItemID = item.ItemID,
-                UserID = GetCurrentUserSupplierID(), // Assuming the current user is updating the stock
-                OldQuantity = item.Quantity,  // The stock before update
-                NewQuantity = item.Quantity,  // The stock after update
-                Action = action, // "Created", "Edited", "Deleted"
-                MovementDate = DateTime.Now
-            };
+            var userId = GetCurrentUserSupplierID();
+            Console.WriteLine($"UserID being passed: {userId}");  // Log the UserID
 
-            _context.StockMovements.Add(stockMovement);
-            _context.SaveChanges();
-        }
+            if (userId == -1)
+            {
+                // Log an error message if the UserID is invalid
+                Console.WriteLine("Error: Invalid UserID, cannot log stock movement.");
+                return; // Exit if UserID is invalid
+            }
+
+            //var stockMovement = new StockMovement
+            //{
+            //    ItemID = item.ItemID,
+            //    UserID = userId, // Ensure this value is valid
+            //    OldQuantity = item.Quantity,
+            //    NewQuantity = item.Quantity,
+            //    Action = action,
+            //    MovementDate = DateTime.Now
+            //};
+            using (var transaction = _context.Database.BeginTransaction())
+            {
+                try
+                {
+                    var stockMovement = new StockMovement
+                    {
+                        ItemID = item.ItemID,
+                        UserID = userId,
+                        OldQuantity = item.Quantity,
+                        NewQuantity = item.Quantity,
+                        Action = action,
+                        MovementDate = DateTime.Now
+                    };
+
+                    _context.StockMovements.Add(stockMovement);
+                    _context.SaveChanges();
+                    transaction.Commit();
+                }
+                catch (Exception ex)
+                {
+                    // Rollback the transaction in case of an error
+                    transaction.Rollback();
+                    Console.WriteLine("Error while saving stock movement: " + ex.Message);
+                }
+            }
+            }
+
 
         // Helper function to get the current user's SupplierID (for Suppliers)
         private int GetCurrentUserSupplierID()
@@ -250,6 +292,16 @@ namespace Inventorymanagement.Controllers
 
                 _context.Add(alert);
                 _context.SaveChanges();
+            }
+            else
+            {
+                // Resolve the alert if stock is above the threshold
+                var alert = _context.Alerts.FirstOrDefault(a => a.ItemID == item.ItemID && a.IsActive);
+                if (alert != null)
+                {
+                    alert.IsActive = false;
+                    _context.SaveChanges();
+                }
             }
         }
     }

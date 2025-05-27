@@ -11,14 +11,14 @@ namespace InventoryManagement.Models
 
         
         [MaxLength(100)]
-        public string Name { get; set; }
+        public string? Name { get; set; }
         
         [EmailAddress]
-        public string Email { get; set; }
+        public string? Email { get; set; }
         
         [Phone]
         [Display(Name = "Contact Phone")]
-        public string ContactPhone { get; set; }
+        public string? ContactPhone { get; set; }
         public virtual List<Item> Items { get; set; } = new List<Item>();
     }
 }
