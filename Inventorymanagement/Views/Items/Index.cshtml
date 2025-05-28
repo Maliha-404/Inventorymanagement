@@ -1,18 +1,46 @@
 ﻿@model IEnumerable<InventoryManagement.Models.Item>
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Item Management";
 }
 
-<h1>Index</h1>
+<h1>Item Management</h1>
 
-<p>
-    @if (User.IsInRole("Manager"))
-    {
-        <a asp-action="Create">Create New Item</a>
-    }
-</p>
+<div class="d-flex justify-content-between mb-3">
+    <!-- Stock Management Button (left side, only for Manager and Supplier) -->
+    <div>
+        @if (User.IsInRole("Manager") || User.IsInRole("Supplier"))
+        {
+            <a asp-action="StockMovements" class="btn btn-primary">Stock Management</a> <!-- Links to stock movements page -->
+        }
+    </div>
 
+    <!-- Create New Item Button (right side, only for Manager) -->
+    <div>
+        @if (User.IsInRole("Manager"))
+        {
+            <a asp-action="Create" class="btn btn-success">Create New Item</a>
+        }
+    </div>
+</div>
+
+
+<!-- Alert Message Display (if available) -->
+@if (ViewData["AlertMessage"] != null)
+{
+    <div class="alert alert-danger">
+        @ViewData["AlertMessage"]
+    </div>
+}
+@if (TempData["LowStockAlert"] != null)
+{
+    <div class="alert alert-warning">
+        @TempData["LowStockAlert"]
+    </div>
+}
+
+
+<!-- Table displaying all items -->
 <table class="table">
     <thead>
         <tr>
@@ -37,7 +65,8 @@
     <tbody>
         @foreach (var item in Model)
         {
-            <tr>
+            <!-- Add conditional class if stock is low -->
+            <tr class="@(item.Quantity <= item.LowStockThreshold ? "bg-danger text-white" : "")">
                 <td>
                     @Html.DisplayFor(modelItem => item.Name)
                 </td>
@@ -56,17 +85,29 @@
                 <td>
                     @if (User.IsInRole("Manager"))
                     {
-                        <a asp-action="Edit" asp-route-id="@item.ItemID">Edit</a>
-                        <a asp-action="Delete" asp-route-id="@item.ItemID">Delete</a> 
+                       
+                        <a asp-action="Edit" asp-route-id="@item.ItemID" class="btn btn-warning">Edit</a>
+                        <a asp-action="Delete" asp-route-id="@item.ItemID" class="btn btn-danger">Delete</a>
                     }
-                    @if (User.IsInRole("Manager") || User.IsInRole("Supplier"))
-                    {
-                        <a asp-action="StockMovements">View Stock Movements</a>
 
-                    }
-                    <a asp-action="Details" asp-route-id="@item.ItemID">Details</a>
+                
+                    <a asp-action="Details" asp-route-id="@item.ItemID" class="btn btn-info">Details</a>
                 </td>
             </tr>
         }
     </tbody>
 </table>
+
+
+<script>
+    $(document).ready(function () {
+        // Check if there's an alert
+        var alertMessage = $('#lowStockAlert');
+        if (alertMessage.length > 0) {
+            // Set a timeout to hide the alert after 5 seconds (5000ms)
+            setTimeout(function () {
+                alertMessage.fadeOut(1000); // Fade out the alert in 1 second
+            }, 5000); // Delay in milliseconds (5000ms = 5 seconds)
+        }
+    });
+</script>

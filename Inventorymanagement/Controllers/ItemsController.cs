@@ -81,6 +81,11 @@ namespace Inventorymanagement.Controllers
                     LogStockMovement(item, "Item Created");
                     CreateLowStockAlert(item);
                     //return RedirectToAction(nameof(Index));
+                    if (item.Quantity < item.LowStockThreshold)
+                    {
+                        // Set an alert message if stock is low
+                        TempData["AlertMessage"] = $"Warning: The stock of {item.Name} is below the threshold!";
+                    }
                 }
                 catch (Exception ex)
                 {
@@ -144,7 +149,11 @@ namespace Inventorymanagement.Controllers
 
                     // Handle the low stock alert after edit
                     CreateLowStockAlert(item);
-
+                    if (item.Quantity < item.LowStockThreshold)
+                    {
+                        // Set an alert message if stock is low
+                        TempData["AlertMessage"] = $"Warning: The stock of {item.Name} is below the threshold!";
+                    }
                     // Redirect to Index after successful update
                     return RedirectToAction(nameof(Index));
                 }
@@ -288,24 +297,29 @@ namespace Inventorymanagement.Controllers
         {
             if (item.Quantity <= item.LowStockThreshold)
             {
-                var alert = new Alert
+                var existingAlert = _context.Alerts.FirstOrDefault(a => a.ItemID == item.ItemID && a.IsActive);
+                if (existingAlert == null)
                 {
-                    ItemID = item.ItemID,
-                    Message = $"Stock is low for item {item.Name}. Please restock.",
-                    CreatedDate = DateTime.Now,
-                    IsActive = true
-                };
+                    var alert = new Alert
+                    {
+                        ItemID = item.ItemID,
+                        Message = $"Stock is low for item {item.Name}. Please restock.",
+                        CreatedDate = DateTime.Now,
+                        IsActive = true
+                    };
+                    TempData["LowStockAlert"] = $"Warning: The stock for {item.Name} is below the threshold. Current stock: {item.Quantity}";
 
-                _context.Add(alert);
-                _context.SaveChanges();
+                    _context.Alerts.Add(alert);
+                    _context.SaveChanges();
+                }
             }
             else
             {
                 // Resolve the alert if stock is above the threshold
-                var alert = _context.Alerts.FirstOrDefault(a => a.ItemID == item.ItemID && a.IsActive);
-                if (alert != null)
+                var existingAlert = _context.Alerts.FirstOrDefault(a => a.ItemID == item.ItemID && a.IsActive);
+                if (existingAlert != null)
                 {
-                    alert.IsActive = false;
+                    existingAlert.IsActive = false;
                     _context.SaveChanges();
                 }
             }
