@@ -1,0 +1,107 @@
+﻿/* Sidebar Styles (Static) */
+.sidebar {
+    width: 230px; /* Fixed width for the sidebar */
+    background-color: blueviolet;
+    color: white;
+    padding-top: 20px;
+    height: 100vh;
+    position: fixed;
+    top: 0;
+    left: 0;
+    transition: 0.3s;
+    z-index: 1000; /* Ensure sidebar stays above the content */
+}
+
+/* Main Content Area */
+.main-content {
+    margin-left: 230px; /* Set margin-left to match sidebar width */
+    padding: 20px;
+    background-color: #ecf0f1;
+    transition: margin-left 0.3s ease;
+    flex-grow: 1;
+    max-width: calc(100% - 230px); /* Adjust width to take up the rest of the space */
+    overflow: hidden; /* Prevent overflow */
+}
+    /* Center the title */
+    .main-content h1 {
+        text-align: center; /* Center the title */
+        margin-bottom: 20px; /* Add space below the title */
+    }
+/* Table container */
+.table-container {
+    margin-top: 10px;
+    margin-left: auto; 
+    margin-right: auto;
+    width: 100%; /* Adjust table width */
+    overflow-x: auto; /* Allow horizontal scrolling if the table is too wide */
+}
+
+/* Table Styling */
+.table {
+    width: 100%;
+    table-layout: fixed; /* Ensure fixed table layout */
+}
+
+    .table td, .table th {
+        padding: 5px 5px;
+        text-align: center;
+    }
+
+    /* Ensure the table text is not hidden */
+    .table td, .table th {
+        color: #333; /* Ensure text is visible */
+        word-wrap: break-word; /* Prevent text overflow */
+    }
+
+/* Make the table fit better without zooming out too much */
+.table-container {
+    max-width: 100%; /* Set max width to 100% */
+    overflow-x: auto; /* Allow horizontal scroll if necessary */
+    margin-left: 0; /* No need for left margin */
+}
+
+/* Adjust button padding and table layout */
+.btn {
+    padding: 8px 16px;
+    font-size: 14px;
+    border-radius: 5px;
+    margin: 3px;
+}
+
+/* Button Styles */
+.btn-warning {
+    background-color: #f39c12;
+    color: white;
+}
+
+.btn-danger {
+    background-color: #e74c3c;
+    color: white;
+}
+
+.btn-info {
+    background-color: #2980b9;
+    color: white;
+}
+
+.btn-success {
+    background-color: #2ecc71;
+    color: white;
+}
+
+/* Responsive for Mobile Devices */
+@media (max-width: 768px) {
+    .table-container {
+        overflow-x: scroll; /* Allow scrolling for smaller screens */
+    }
+
+    .table th, .table td {
+        font-size: 12px;
+        padding: 5px 5px;
+    }
+
+    .btn {
+        font-size: 12px;
+        padding: 6px 12px;
+    }
+}

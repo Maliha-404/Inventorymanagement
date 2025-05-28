@@ -1,0 +1,62 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Inventory Management</title>
+    <link rel="stylesheet" href="~/css/dashboard.css">
+    <link rel="stylesheet" href="~/css/custom.css" asp-append-version="true" />
+
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Sidebar (Static) -->
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <img src="/images/inventory.png" alt="Logo" width="40" height="40">
+                <h4>Inventory Management</h4>
+            </div>
+            <ul class="sidebar-menu">
+                <li><a href="/Dashboard/Index">Dashboard</a></li>
+                 @if (User.IsInRole("Manager"))
+            {
+                <li><a href="/Users/Index">User Management</a></li>
+            }
+                <li><a href="/Items/Index">Item Management</a></li>
+                <li><a href="/Orders/Index">Order Management</a></li>
+                 @if (User.IsInRole("Manager"))
+            {
+                <li><a href="/Suppliers/Index">Supplier Management</a></li>
+            }
+            </ul>
+        </div>
+
+        <!-- Main Content Area (Dynamic) -->
+        <div class="main-content">
+           
+                <!-- Logout Button positioned on the right -->
+                <div class="logout-container">
+                    <a href="/Users/Logout" class="btn-logout">Logout</a>
+                </div>
+            </div>
+
+            <!-- Dynamic Content Here -->
+            <main role="main" class="pb-3">
+                @RenderBody()
+            </main>
+        </div>
+    </div>
+
+    <footer class="dashboard-footer">
+        <p>&copy; 2025 - Inventory Management</p>
+    </footer>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

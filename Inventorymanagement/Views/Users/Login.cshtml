@@ -8,7 +8,10 @@
     <div id="login-card" class="card shadow-lg p-4 rounded-3" style="width: 100%; max-width: 400px; transform: translateY(50px); opacity: 0; transition: transform 1s ease-out, opacity 1s ease-out;">
         <div class="card-body">
             <!-- Header for the page -->
-            <h2 class="text-center mb-4">Inventory Management</h2>
+            <div class="d-flex align-items-center mb-4">
+                <img src="images/inventory.png" alt="Logo" style="height: 40px; margin-right: 10px;" />
+                <h2 class="mb-0">Inventory Management</h2>
+            </div>
 
             <!-- Login Form -->
             <form method="post" asp-controller="Users" asp-action="Login">
@@ -163,6 +166,11 @@
     .alert-success {
         background-color: #28a745;
         color: white;
+    }
+    /* Remove the white border above the title */
+    #login-card h2 {
+        margin-top: 0;
+        border-top: none;
     }
 
     .alert-danger {

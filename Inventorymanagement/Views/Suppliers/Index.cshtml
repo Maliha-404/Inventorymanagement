@@ -1,14 +1,23 @@
 ﻿@model IEnumerable<InventoryManagement.Models.Supplier>
+@{
+    Layout = "PageLayout";  
+}
 
 @{
     ViewData["Title"] = "Supplier List";
 }
+<div class="main-content">
+    <h1 class="text-center">Supplier List</h1>
 
-<h1>Supplier List</h1>
-
-<p>
-    <a href="@Url.Action("Create", "Suppliers")" class="btn btn-primary">Create New Supplier</a>
-</p>
+<div class="d-flex justify-content-between mb-3">
+    
+    <div>
+        
+        
+            <a asp-action="Create" class="btn btn-success">Create New </a>
+        
+    </div>
+</div>
 
 <table class="table">
     <thead>
@@ -34,3 +43,4 @@
         }
     </tbody>
 </table>
+</div>
